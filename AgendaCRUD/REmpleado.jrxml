@@ -1,0 +1,77 @@
+<!-- Created with Jaspersoft Studio version 7.0.3.final using JasperReports Library version 7.0.3-41034ca841d452f3305ba55b9042260aaa1ab5dd  -->
+<jasperReport name="REmpleado" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0ed5dcf9-064a-448d-ba8e-e6d35ae397e8">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="SQLite JDBC"/>
+	<query language="SQL"><![CDATA[SELECT * FROM tblEmpleado]]></query>
+	<field name="id_empleado" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="id_empleado"/>
+		<property name="com.jaspersoft.studio.field.label" value="id_empleado"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="tblEmpleado"/>
+	</field>
+	<field name="nom_empleado" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="nom_empleado"/>
+		<property name="com.jaspersoft.studio.field.label" value="nom_empleado"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="tblEmpleado"/>
+	</field>
+	<field name="direccion" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="direccion"/>
+		<property name="com.jaspersoft.studio.field.label" value="direccion"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="tblEmpleado"/>
+	</field>
+	<field name="telefono" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="telefono"/>
+		<property name="com.jaspersoft.studio.field.label" value="telefono"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="tblEmpleado"/>
+	</field>
+	<field name="correo" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="correo"/>
+		<property name="com.jaspersoft.studio.field.label" value="correo"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="tblEmpleado"/>
+	</field>
+	<background splitType="Stretch"/>
+	<title height="79" splitType="Stretch">
+		<element kind="staticText" uuid="d5e80356-959d-49a3-ba94-3f9041ce5aa8" x="150" y="20" width="270" height="30" fontSize="19.0" hTextAlign="Center">
+			<text><![CDATA[Lista de Empleados]]></text>
+		</element>
+	</title>
+	<pageHeader height="35" splitType="Stretch"/>
+	<columnHeader height="39" splitType="Stretch">
+		<element kind="staticText" uuid="4b15b27b-1bc8-40ac-8d69-5b9eaebf1fa4" x="-11" y="10" width="20" height="21" hTextAlign="Center">
+			<text><![CDATA[No.]]></text>
+		</element>
+		<element kind="staticText" uuid="237d5c59-4089-4bdb-a0c9-4cf8d3288860" x="40" y="10" width="130" height="21" hTextAlign="Center">
+			<text><![CDATA[Nombre del empleado]]></text>
+		</element>
+		<element kind="staticText" uuid="1f0ced79-22aa-467d-9d9c-628e198b4a8d" x="190" y="10" width="100" height="21" hTextAlign="Center">
+			<text><![CDATA[Dirección]]></text>
+		</element>
+		<element kind="staticText" uuid="dec74219-5fb5-465d-8222-8cb1dbfcdab1" x="310" y="10" width="100" height="21" hTextAlign="Center">
+			<text><![CDATA[Teléfono]]></text>
+		</element>
+		<element kind="staticText" uuid="7e6e6de0-4850-4c5f-ac4b-b257fe984ed1" x="440" y="9" width="100" height="21" hTextAlign="Center">
+			<text><![CDATA[Correo]]></text>
+		</element>
+	</columnHeader>
+	<detail>
+		<band height="58" splitType="Stretch">
+			<element kind="textField" uuid="f4ef05ff-a869-4e4f-a3ce-f881458f355a" x="-10" y="10" width="40" height="30">
+				<expression><![CDATA[$F{id_empleado}]]></expression>
+			</element>
+			<element kind="textField" uuid="145e55f8-cc42-40ed-9150-2d5b5b381469" x="40" y="10" width="130" height="30">
+				<expression><![CDATA[$F{nom_empleado}]]></expression>
+			</element>
+			<element kind="textField" uuid="b49832ae-59b1-45f0-a757-d0e78db8c65d" x="190" y="10" width="100" height="30">
+				<expression><![CDATA[$F{direccion}]]></expression>
+			</element>
+			<element kind="textField" uuid="28ad28ae-91a9-4d57-a385-366c1b07acdd" x="310" y="10" width="100" height="30" hTextAlign="Center">
+				<expression><![CDATA[$F{telefono}]]></expression>
+			</element>
+			<element kind="textField" uuid="41c4383a-504b-4860-a69a-b97304afa1a2" x="430" y="10" width="120" height="30">
+				<expression><![CDATA[$F{correo}]]></expression>
+			</element>
+		</band>
+	</detail>
+	<columnFooter height="45" splitType="Stretch"/>
+	<pageFooter height="54" splitType="Stretch"/>
+	<summary height="42" splitType="Stretch"/>
+</jasperReport>
