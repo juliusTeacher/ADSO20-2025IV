@@ -2,8 +2,12 @@ package com.agenda;
 
 import java.awt.HeadlessException;
 import java.sql.*;
+import java.util.logging.*;
 import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.RowFilter;
+import javax.swing.table.*;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.view.JasperViewer;
 
 public class frmPrincipal extends javax.swing.JFrame {
 
@@ -14,12 +18,14 @@ public class frmPrincipal extends javax.swing.JFrame {
     ResultSet rs;
     DefaultTableModel modelo;
     
-    String id_emp;
+    int idEmp; // => Manejo de las operaciones restantes (Editar, eliminar);
 
     public frmPrincipal() {
         initComponents();
-        listar();
+        id_autoincrementable();
         inhabilitar_txt();
+        inhabilitar_btn();
+        listar();
     }
 
     /* Método para listar los datos de la tabla tblEmpeado a través del componente: tablaEmpleado */
@@ -51,13 +57,13 @@ public class frmPrincipal extends javax.swing.JFrame {
     public void registrar() {
         try {
 
-            String codigo = txtCodigo.getText();
+            int codigo = Integer.parseInt(txtCodigo.getText());
             String nom = txtNombre.getText();
             String dir = txtDireccion.getText();
             String tel = txtTelefono.getText();
             String email = txtCorreo.getText();
 
-            if (codigo.equals("") || nom.equals("") || dir.equals("") || tel.equals("") || email.equals("")) {
+            if (Integer.toString(codigo).equals("") || nom.equals("") || dir.equals("") || tel.equals("") || email.equals("")) {
                 JOptionPane.showMessageDialog(null, "Ingrese el registro del empleado", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 limpiarTabla(modelo);
                 txtCodigo.requestFocus();
@@ -70,6 +76,8 @@ public class frmPrincipal extends javax.swing.JFrame {
                 st.executeUpdate(sql);
                 JOptionPane.showMessageDialog(null, "Empleado registrado exitosamente", "Mensaje", JOptionPane.PLAIN_MESSAGE);
                 limpiarTabla(modelo);
+                inhabilitar_txt();
+                btnRegistrar.setEnabled(false);
             }
 
         } catch (HeadlessException | SQLException e) {
@@ -100,6 +108,7 @@ public class frmPrincipal extends javax.swing.JFrame {
                 st.executeUpdate(sql);
                 JOptionPane.showMessageDialog(null, "Empleado actualizado", "Mensaje", JOptionPane.PLAIN_MESSAGE);
                 limpiarTabla(modelo);
+                btnEditar.setEnabled(false);
             } catch (HeadlessException | SQLException e) {
                 JOptionPane.showMessageDialog(null, "Error " + e.toString(), "Error", JOptionPane.ERROR_MESSAGE);
                 limpiarTabla(modelo);
@@ -125,6 +134,7 @@ public class frmPrincipal extends javax.swing.JFrame {
                 st.executeUpdate(sql);
                 JOptionPane.showMessageDialog(null, "¡Empleado eliminado!","Mensaje",JOptionPane.PLAIN_MESSAGE);
                 limpiarTabla(modelo);
+                btnEliminar.setEnabled(false);
             } catch (HeadlessException | SQLException e) {
                 JOptionPane.showMessageDialog(null, "Error " + e.toString(), "Error", JOptionPane.ERROR_MESSAGE);
                 limpiarTabla(modelo);
@@ -134,6 +144,49 @@ public class frmPrincipal extends javax.swing.JFrame {
         }
     }
     
+    /* Método para realizar el reporte */
+    public void RptEmpleados(){
+        var reportPath = "C:\\Users\\DELL\\Documents\\ADSO-20\\AgendaCRUD\\REmpleado.jrxml";
+        JasperReport jr;
+        try {
+            cn = con.establerConexion();
+            jr = JasperCompileManager.compileReport(reportPath);
+            JasperPrint jp = JasperFillManager.fillReport(jr,null,cn);
+            JasperViewer jv = new JasperViewer(jp, false);
+            jv.setVisible(true);
+        } catch (JRException ex) {
+            Logger.getLogger(frmPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            con.cierreConexion();
+        }
+    }
+    
+    /* Método para realizar la búsqueda por cualquier tipo en la tabla: tblEmpleado */
+    public void busqueda_por(){
+        modelo = (DefaultTableModel) tablaEmpleado.getModel();
+        TableRowSorter<DefaultTableModel> tabla = new TableRowSorter<>(modelo);
+        tablaEmpleado.setRowSorter(tabla);
+        tabla.setRowFilter(RowFilter.regexFilter(txtBuscar.getText()));
+    }
+    
+    /* Método para mostrar el autoincrementable: txtCodigo */
+    public final void id_autoincrementable(){
+        try {
+            String sql = "SELECT id_empleado FROM tblEmpleado ORDER BY id_empleado DESC LIMIT 1";
+            cn = con.establerConexion();
+            st = cn.createStatement();
+            rs = st.executeQuery(sql);
+            if(rs.next()){
+                int id = rs.getInt(1);
+                int n = id+1;
+                txtCodigo.setText(Integer.toString(n));
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error " + e.toString(), "Error", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            con.cierreConexion();
+        }
+    }
 
     public void limpiarTabla(DefaultTableModel model) {
         for (int i = 0; tablaEmpleado.getRowCount() > i; i++) {
@@ -151,7 +204,7 @@ public class frmPrincipal extends javax.swing.JFrame {
     }
     
     /* Método para inhabilitar las cajas de texto */
-    public void inhabilitar_txt(){
+    public final void inhabilitar_txt(){
         txtCodigo.setEditable(false);
         txtNombre.setEditable(false);
         txtDireccion.setEditable(false);
@@ -166,7 +219,14 @@ public class frmPrincipal extends javax.swing.JFrame {
         txtDireccion.setEditable(true);
         txtTelefono.setEditable(true);
         txtCorreo.setEditable(true);
-        txtCodigo.requestFocus();
+        txtNombre.requestFocus();
+    }
+    
+    /* Método para ihnabilitar los botones */
+    public final void inhabilitar_btn(){
+        btnRegistrar.setEnabled(false);
+        btnEditar.setEnabled(false);
+        btnEliminar.setEnabled(false);
     }
 
     /**
@@ -313,8 +373,19 @@ public class frmPrincipal extends javax.swing.JFrame {
 
         btnReporte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/print.png"))); // NOI18N
         btnReporte.setToolTipText("Imprimir Reporte");
+        btnReporte.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReporteActionPerformed(evt);
+            }
+        });
 
         lblBuscar.setText("Búsqueda");
+
+        txtBuscar.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtBuscarKeyReleased(evt);
+            }
+        });
 
         btnNuevo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/add.png"))); // NOI18N
         btnNuevo.setToolTipText("Activar Registro");
@@ -331,14 +402,7 @@ public class frmPrincipal extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(6, 6, 6)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(layout.createSequentialGroup()
-                            .addGap(12, 12, 12)
-                            .addComponent(lblBuscar)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(11, 11, 11)))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnNuevo)
                         .addGap(6, 6, 6)
@@ -348,8 +412,12 @@ public class frmPrincipal extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnEliminar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnReporte)))
-                .addGap(7, 7, 7)
+                        .addComponent(btnReporte))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblBuscar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 236, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 672, Short.MAX_VALUE)
                 .addContainerGap())
         );
@@ -383,6 +451,7 @@ public class frmPrincipal extends javax.swing.JFrame {
         registrar();
         listar();
         limpiar_txt();
+        id_autoincrementable();
     }//GEN-LAST:event_btnRegistrarActionPerformed
 
     private void tablaEmpleadoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaEmpleadoMouseClicked
@@ -403,6 +472,9 @@ public class frmPrincipal extends javax.swing.JFrame {
             txtDireccion.setText(direccion);
             txtTelefono.setText(telefono);
             txtCorreo.setText(correo);
+            habilitar_txt();
+            btnEditar.setEnabled(true);
+            btnEliminar.setEnabled(true);
         }
         
     }//GEN-LAST:event_tablaEmpleadoMouseClicked
@@ -412,6 +484,9 @@ public class frmPrincipal extends javax.swing.JFrame {
         modificar();
         listar();
         limpiar_txt();
+        inhabilitar_txt();
+        inhabilitar_btn();
+        id_autoincrementable();
     }//GEN-LAST:event_btnEditarActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
@@ -419,12 +494,27 @@ public class frmPrincipal extends javax.swing.JFrame {
         eliminar();
         listar();
         limpiar_txt();
+        inhabilitar_txt();
+        inhabilitar_btn();
+        id_autoincrementable();
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
         // TODO add your handling code here:
         habilitar_txt();
+        btnRegistrar.setEnabled(true);
+        id_autoincrementable();
     }//GEN-LAST:event_btnNuevoActionPerformed
+
+    private void txtBuscarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscarKeyReleased
+        // TODO add your handling code here:
+        busqueda_por();
+    }//GEN-LAST:event_txtBuscarKeyReleased
+
+    private void btnReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReporteActionPerformed
+        // TODO add your handling code here:
+        RptEmpleados();
+    }//GEN-LAST:event_btnReporteActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
