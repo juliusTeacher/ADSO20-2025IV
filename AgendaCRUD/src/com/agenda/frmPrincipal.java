@@ -77,7 +77,6 @@ public class frmPrincipal extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Empleado registrado exitosamente", "Mensaje", JOptionPane.PLAIN_MESSAGE);
                 limpiarTabla(modelo);
                 inhabilitar_txt();
-                btnRegistrar.setEnabled(false);
             }
 
         } catch (HeadlessException | SQLException e) {
@@ -90,7 +89,7 @@ public class frmPrincipal extends javax.swing.JFrame {
     
     /* Método para modificar y/o actualizar un empleado y se confirme en la tabla: tblEmpleado */
     public void modificar(){
-        String id = txtCodigo.getText();
+        idEmp = Integer.parseInt(txtCodigo.getText());
         String nom = txtNombre.getText();
         String dir = txtDireccion.getText();
         String tel = txtTelefono.getText();
@@ -101,14 +100,13 @@ public class frmPrincipal extends javax.swing.JFrame {
             limpiarTabla(modelo);
         }
         else{
-            String sql = "UPDATE tblEmpleado SET nom_empleado='"+nom+"',direccion='"+dir+"',telefono='"+tel+"',correo='"+email+"' WHERE id_empleado="+id;
+            String sql = "UPDATE tblEmpleado SET nom_empleado='"+nom+"',direccion='"+dir+"',telefono='"+tel+"',correo='"+email+"' WHERE id_empleado= "+idEmp;
             try {
                 cn = con.establerConexion();
                 st = cn.createStatement();
                 st.executeUpdate(sql);
                 JOptionPane.showMessageDialog(null, "Empleado actualizado", "Mensaje", JOptionPane.PLAIN_MESSAGE);
                 limpiarTabla(modelo);
-                btnEditar.setEnabled(false);
             } catch (HeadlessException | SQLException e) {
                 JOptionPane.showMessageDialog(null, "Error " + e.toString(), "Error", JOptionPane.ERROR_MESSAGE);
                 limpiarTabla(modelo);
@@ -120,10 +118,10 @@ public class frmPrincipal extends javax.swing.JFrame {
     
     /* Método para eliminar un empleado y se confirme en la tabla: tblEmpleado */
     public void eliminar(){
-        String id = txtCodigo.getText();
-        String sql = "DELETE FROM tblEMpleado WHERE id_empleado ="+id;
+        idEmp = Integer.parseInt(txtCodigo.getText());
+        String sql = "DELETE FROM tblEMpleado WHERE id_empleado ="+idEmp;
         int seleccionado = tablaEmpleado.getSelectedRow();
-        if(seleccionado < 0){
+        if(seleccionado == -1){
             JOptionPane.showMessageDialog(null, "Seleccione el registro del empleado", "Advertencia", JOptionPane.WARNING_MESSAGE);
             limpiarTabla(modelo);
         }
@@ -134,7 +132,6 @@ public class frmPrincipal extends javax.swing.JFrame {
                 st.executeUpdate(sql);
                 JOptionPane.showMessageDialog(null, "¡Empleado eliminado!","Mensaje",JOptionPane.PLAIN_MESSAGE);
                 limpiarTabla(modelo);
-                btnEliminar.setEnabled(false);
             } catch (HeadlessException | SQLException e) {
                 JOptionPane.showMessageDialog(null, "Error " + e.toString(), "Error", JOptionPane.ERROR_MESSAGE);
                 limpiarTabla(modelo);
@@ -172,7 +169,7 @@ public class frmPrincipal extends javax.swing.JFrame {
     /* Método para mostrar el autoincrementable: txtCodigo */
     public final void id_autoincrementable(){
         try {
-            String sql = "SELECT id_empleado FROM tblEmpleado ORDER BY id_empleado DESC LIMIT 1";
+            String sql = "SELECT id_empleado FROM tblEmpleado ORDER BY id_empleado DESC";
             cn = con.establerConexion();
             st = cn.createStatement();
             rs = st.executeQuery(sql);
@@ -503,7 +500,6 @@ public class frmPrincipal extends javax.swing.JFrame {
         // TODO add your handling code here:
         habilitar_txt();
         btnRegistrar.setEnabled(true);
-        id_autoincrementable();
     }//GEN-LAST:event_btnNuevoActionPerformed
 
     private void txtBuscarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscarKeyReleased
